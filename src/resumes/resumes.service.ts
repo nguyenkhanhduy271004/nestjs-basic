@@ -7,11 +7,14 @@ import { Resume, ResumeDocument } from './schemas/resume.schema';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import aqp from 'api-query-params';
 import mongoose from 'mongoose';
+import { User } from 'src/decorators/customize';
+import { UserDocument } from 'src/users/schemas/user.schema';
 
 @Injectable()
 export class ResumesService {
   constructor(
     @InjectModel(Resume.name) private resumeModel: SoftDeleteModel<ResumeDocument>,
+    @InjectModel(User.name) private userModel: SoftDeleteModel<UserDocument>,
   ) { }
 
   async create(createResumeDto: CreateResumeDto, user: IUser) {
@@ -40,10 +43,11 @@ export class ResumesService {
     }
   }
 
-  async findAll(currentPage: number, limit: number, qs: string) {
+  async findAll(currentPage: number, limit: number, qs: string, user: IUser) {
     const { filter, sort, population, projection } = aqp(qs);
     delete filter.current;
     delete filter.pageSize;
+    // console.log(user);
 
     let offset = (+currentPage - 1) * (+limit);
     let defaultLimit = +limit ? +limit : 10;

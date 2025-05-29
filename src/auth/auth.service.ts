@@ -24,6 +24,7 @@ export class AuthService {
                 const userRole = user.role as unknown as { _id: string, name: string };
                 const temp = await this.rolesService.findOne(userRole._id);
 
+
                 const objUser = {
                     ...user.toObject(),
                     permissions: temp?.permissions ?? []
@@ -36,7 +37,7 @@ export class AuthService {
     }
 
     async login(user: IUser, response: Response) {
-        const { _id, name, email, role, permissions } = user;
+        const { _id, name, email, role, company, permissions } = user;
         const payload = {
             sub: "token login",
             iss: "from server",
@@ -44,6 +45,7 @@ export class AuthService {
             name,
             email,
             role,
+            companyId: company._id
         };
         const refresh_token = await this.createRefreshToken(payload);
         await this.usersService.updateUserToken(refresh_token, _id);
@@ -58,7 +60,7 @@ export class AuthService {
                 name,
                 email,
                 role,
-                permissions
+                permissions,
             }
         };
     }
@@ -83,7 +85,7 @@ export class AuthService {
                 throw new BadRequestException('User không tồn tại');
             }
 
-            const { _id, name, email, role } = user;
+            const { _id, name, email, company, role } = user;
 
             const payload = {
                 sub: "token refresh",
@@ -91,7 +93,8 @@ export class AuthService {
                 _id,
                 name,
                 email,
-                role
+                role,
+                companyId: company._id
             };
 
             const refresh_token = await this.createRefreshToken(payload);

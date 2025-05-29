@@ -9,7 +9,9 @@ import { ApiTags } from '@nestjs/swagger';
 @ApiTags('Resumes')
 @Controller('resumes')
 export class ResumesController {
-  constructor(private readonly resumesService: ResumesService) { }
+  constructor(
+    private readonly resumesService: ResumesService,
+  ) { }
 
   @Post()
   @ResponseMessage("Create a new resume")
@@ -22,8 +24,10 @@ export class ResumesController {
   findAll(
     @Query("current") currentPage: string,
     @Query("pageSize") limit: string,
-    @Query() qs: string) {
-    return this.resumesService.findAll(+currentPage, +limit, qs);
+    @Query() qs: string,
+    @User() user: IUser
+  ) {
+    return this.resumesService.findAll(+currentPage, +limit, qs, user);
   }
 
   @Get(':id')
